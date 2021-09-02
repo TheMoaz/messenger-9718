@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  messageRead
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -74,6 +75,12 @@ export const fetchConversations = () => async (dispatch) => {
     const { data } = await axios.get("/api/conversations");
     data.forEach(convo => {
       convo.messages.reverse()
+      let unreadCount = 0
+        convo.messages.forEach(message => {
+          if(!message.readFlag && message.senderId == convo.otherUser.id)
+            unreadCount = unreadCount+1
+        })
+        convo.unreadCount = unreadCount
     });
     dispatch(gotConversations(data));
   } catch (error) {
@@ -120,3 +127,10 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+//Active Chat Messages Read Update
+export const activeChatMessageRead = (body) => async (dispatch) => {
+  // API call to update readFlag of messages
+  const { data } = await axios.put("/api/messages", body);
+  dispatch(messageRead(body.convoId))
+}

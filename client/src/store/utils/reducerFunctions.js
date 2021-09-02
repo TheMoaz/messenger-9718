@@ -8,6 +8,7 @@ export const addMessageToStore = (state, payload) => {
       messages: [message],
     };
     newConvo.latestMessageText = message.text;
+    newConvo.otherUser.id != message.senderId ? newConvo.unreadCount = 0 : newConvo.unreadCount = 1
     return [newConvo, ...state];
   }
 
@@ -16,6 +17,8 @@ export const addMessageToStore = (state, payload) => {
       const convoCopy = {...convo}
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
+      if(convoCopy.otherUser.id == message.senderId)
+        convoCopy.unreadCount = convoCopy.unreadCount + 1 
       return convoCopy;
     } else {
       return convo;
@@ -74,9 +77,29 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       convoCopy.id = message.conversationId;
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
+      message.senderId == convoCopy.otherUser.id ? convoCopy.unreadCount = 1 : convoCopy.unreadCount = 0
       return convoCopy;
     } else {
       return convo;
     }
   });
 };
+
+//Reducer for updating state read messages. 
+export const readMessages = (state, conversationId) => {
+  return state.map( (convo) => {
+    if(convo.id === conversationId) {
+      const newConvo = {...convo}
+      newConvo.unreadCount = 0
+      newConvo.messages = newConvo.messages.map( (message) => {
+        if(message.senderId === newConvo.otherUser.id)
+          message.readFlag = true
+        return message
+      })
+      return newConvo
+    }
+    else{
+      return convo
+    }
+  })
+}
