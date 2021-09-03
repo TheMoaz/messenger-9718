@@ -1,0 +1,24 @@
+Issue # 3
+
+Database changes :
+Conversation-> Remove UserId columns
+Create a third(Join) table to express cardinality of many to many relation between user and conversation
+Join table will consist of coversation id column and user Id column, -> each record will represent memebrship of user in a conversation
+
+Read Flag. 
+Since the messages can need to be read by multiple users to implement effective read message flag, 
+-> Remove readFlag from messages
+-> Create a table between messages and ReadFlag -> cardinality 1 to many
+-> ReadFlag table will consist of messageId, userId, readFlag column
+-> each record in ReadFlag will indicate read status of message by each user
+-> to implement this we need to insert read record in readFlag table every time a message is sent to a conversation with all the users that are member of conversation
+
+High Level Details of additional implementations:
+
+FetchConversations
+Will have to run query on join table between conversations and users. to fetch user is present in which conversation. will give us conversation IDs
+Messages will be retrieved against all these conversation ids. 
+
+SendMessage. 
+When message will be sent it will be sent to conversation rather than user. logically. 
+Socket.emit functions need to be modified to accomodate, fetch all users related to that conversation and send message to them. 
