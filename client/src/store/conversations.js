@@ -4,7 +4,8 @@ import {
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
-  readMessages
+  readMessages,
+  markReadReciept
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -17,6 +18,7 @@ const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
 const MESSAGE_READ = "MESSAGE_READ"
+const READ_RECIEPT = "READ_RECIEPT"
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
@@ -76,6 +78,14 @@ export const messageRead = (conversationId) => {
   }
 }
 
+// update read Reciepts of messages
+export const updateReadReciept = (lastMessage) => {
+  return {
+    type: READ_RECIEPT,
+    lastMessage 
+  }
+}
+
 // REDUCER
 
 const reducer = (state = [], action) => {
@@ -105,6 +115,11 @@ const reducer = (state = [], action) => {
         state, 
         action.conversationId
       )
+    case READ_RECIEPT:
+    return markReadReciept(
+      state, 
+      action.lastMessage
+    )
     default:
       return state;
   }

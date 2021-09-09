@@ -27,13 +27,12 @@ const ActiveChat = (props) => {
   const conversation = props.conversation || {};
 
   useEffect(() => {
-    if(props.conversation)
+    if(conversation.id)
       activeChatMessageRead({
         convoId : conversation.id,
         userId: user.id
       })
   }, [conversation.id, user.id, conversation.unreadCount, activeChatMessageRead])
-
 
   return (
     <Box className={classes.root}>
@@ -48,6 +47,7 @@ const ActiveChat = (props) => {
               messages={conversation.messages}
               otherUser={conversation.otherUser}
               userId={user.id}
+              otherUserLastRead = {conversation.otherUserLastRead}
             />
             <Input
               otherUser={conversation.otherUser}

@@ -46,6 +46,24 @@ router.post("/", async (req, res, next) => {
 
 router.put("/", async (req, res, next) => {
   const {convoId, userId} = req.body
+    
+  if (!req.user || req.user.id !== userId) {
+    return res.sendStatus(401);
+  }
+  console.log("fetching convo for : " +userId)
+  //Check if user is part of the conversation. 
+  let conversation = Conversation.findOne({
+    where: {
+      [Op.and] : {
+        [Op.or] : [{user1Id: userId}, {user2Id: userId}],
+        id: convoId
+      }
+    }
+  });
+    console.log(conversation)
+  if(!conversation){
+    return res.sendStatus(401)
+  }
   const message = await Message.update({readFlag: true}, {
     where: {
       conversationId: convoId,
