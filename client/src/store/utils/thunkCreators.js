@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  messageRead
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -119,4 +120,29 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+const sendReadReciept = (message) => {
+  socket.emit("read-message", {
+    message: message,
+  });
+};
+
+//Active Chat Messages Read Update
+export const activeChatMessageRead = (body) => async (dispatch, getState) => {
+  // API call to update readFlag of messages
+  const { data } = await axios.put("/api/messages", {convoId: body.convoId, userId: body.userId});
+
+  const convo = getState().conversations.filter((convo) => convo.id === body.convoId)[0]
+  sendReadReciept(convo.messages[lastIndexOf(convo.messages, convo.otherUser.id)])
+  dispatch(messageRead(body.convoId))
+}
+
+//utility function
+const lastIndexOf = (array, key) => {
+  for(let i = array.length - 1; i >= 0; i--){
+    if(array[i].key === key)
+      return i;
+  }
+  return array.length-1;
 };
